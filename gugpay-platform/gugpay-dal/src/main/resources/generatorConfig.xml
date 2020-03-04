@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+    <!-- 导入配置文件 -->
+    <properties resource="generator.properties"/>
+
+    <!-- 驱动包 -->
+    <classPathEntry location="${generator.classPathEntry}"/>
+
+    <!-- 指定generator环境 flat:仅生成一个table中所有域的类-->
+    <context id="MysqlContext" targetRuntime="MyBatis3" defaultModelType="flat">
+        <!--(0,n)-->
+        <!--处理Java文件时的编码-->
+        <property name="javaFileEncoding" value="UTF-8"/>
+        <!--sql标识符 默认" -->
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
+        <property name="useActualColumnNames" value="false"/>
+
+        <!--plugin 来调用插件-->
+        <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
+        <plugin type="com.gugpay.dal.dao.plugin.SerializablePlugin">
+            <property name="suppressJavaInterface" value="false"/>
+        </plugin>
+        <plugin type="com.gugpay.dal.dao.plugin.PaginationPlugin"/>
+        <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>
+
+        <commentGenerator type="com.gugpay.dal.dao.plugin.CommentGenerator">
+            <!--生成的代码是否包含注释-->
+            <property name="suppressAllComments" value="true"/>
+            <!--是否生成时间戳-->
+            <property name="suppressDate" value="true"/>
+            <!--生成表和列注释-->
+            <property name="addRemarkComments" value="true"/>
+        </commentGenerator>
+
+        <jdbcConnection driverClass="${generator.jdbc.driver}" connectionURL="${generator.jdbc.url}"
+                        userId="${generator.jdbc.username}" password="${generator.jdbc.password}"/>
+
+        <javaModelGenerator targetPackage="com.gugpay.dal.dao.model" targetProject="src/main/java"/>
+
+        <!-- require, mapper.xml文件生成-->
+        <sqlMapGenerator targetPackage="com.gugpay.dal.dao.mapper" targetProject="src/main/resources"/>
+
+        <!--optional java接口生成 与xml文件对应-->
+        <javaClientGenerator targetPackage="com.gugpay.dal.dao.mapper" targetProject="src/main/java" type="XMLMAPPER"/>
+
+        <table tableName="t_iap_receipt" domainObjectName="IapReceipt">
+            <!--开启作用数据库列名作为属性命名-->
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+
+        <table tableName="t_mch_info" domainObjectName="MchInfo">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+
+        <table tableName="t_pay_channel" domainObjectName="PayChannel">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+
+        <table tableName="t_pay_order" domainObjectName="PayOrder">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+
+        <table tableName="t_trans_order" domainObjectName="TransOrder">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+        
+        <table tableName="t_refund_order" domainObjectName="RefundOrder">
+            <property name="useActualColumn" value="true"/>
+        </table>
+
+    </context>
+</generatorConfiguration>

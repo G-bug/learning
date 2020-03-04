@@ -1,0 +1,23 @@
+server:
+  port: 8003
+
+spring:
+  application:
+    name: gugpay-consumer
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:  # 无需注册到consul
+        register: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,bus-refresh  # 开启config client: refresh对单个配置的更新, bus-refresh 对总线上的全部更新
+      base-path: /
+
+feign:            # feign 远程调用开启熔断
+  hystrix:
+    enabled: true

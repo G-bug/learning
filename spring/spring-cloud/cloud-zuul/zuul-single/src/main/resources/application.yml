@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: zuul-singl
+  zipkin: # 跟踪
+    base-url: http://ZIPKIN-SERVER:9000
+  sleuth:
+    sampler:
+      percentage: 1.0
+
+server:
+  port: 8002
+
+zuul:
+  ignored-services: "*"      # 忽略的请求, 排除routes中的
+  routes:
+    hello:                    # 单个url映射
+      path: /hello/**        # /* 只过滤一层, /** 过滤多层
+      url: http://localhost:9001/
+    api-a:                    # 针对某个服务配合eureka
+      path: /pro/**
+      service-id: hystrix-producer
+  FormBodyWapperFilter:       # 关闭指定的filter
+    pre:
+      disable: true
+  retryable: true             # 开启失败请求重试功能
+
+ribbon:
+  MaxAutoRetries: 5           # 自动尝试的次数
+  MaxAutoRetriesNextServer: 4 # 切换请求同server的次数, 0 则直接到达熔断
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+
+
+
+

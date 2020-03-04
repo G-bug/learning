@@ -1,0 +1,20 @@
+spring:
+  cloud:      # spring.cloud 相关属性先于application.yml加载
+    config:
+      name: learn-config            # 配置文件名前部分
+      profile: dev  # 文件名后部分
+      #uri: http://localhost:8000/  # 加入eureka之后需要去除该配置
+      label: master                 # git分支(默认master)
+      discovery:                    # eureka client
+        enabled: true
+        service-id: config-server
+  rabbitmq:     # 向bus发refresh请求
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/

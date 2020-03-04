@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: config-client
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,bus-refresh # 打开 /refresh 的监控点, 消息总线 /bus-refresh
+      base-path: /
+
+---
+spring:
+  profiles: client1
+
+server:
+  port: 8004
+
+---
+spring:
+  profiles: client2
+
+server:
+  port: 8002

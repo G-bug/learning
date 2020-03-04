@@ -1,0 +1,20 @@
+
+server:
+  prot: 8080
+
+# 使用ActiveMQ Server
+spring:
+  activemq:
+    # 队列地址
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: admin
+    # 是否是内存模式
+    in-memory: true
+
+logging:
+  level:
+    ROOT: INFO
+    com:
+      learn.mq: DEBUG
+  file: D:/logs/activemq.log

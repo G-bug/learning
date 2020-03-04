@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: hystrix-consumer-01
+  profiles: csm1
+
+server:
+  port: 9003
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+
+feign:
+  hystrix:
+    enabled: true
+
+--- # 模拟多调用者的情况
+spring:
+  application:
+    name: hystrix-consumer-02
+  profiles: csm2
+
+server:
+  port: 9004
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+
+feign:
+  hystrix:
+    enabled: true

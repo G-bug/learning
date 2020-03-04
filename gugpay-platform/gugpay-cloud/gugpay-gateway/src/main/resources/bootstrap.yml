@@ -1,0 +1,21 @@
+spring:
+  cloud:
+    config:
+      name: gugpay-gateway.yml
+      fail-fast: true
+      username: user
+      password: gugpay
+      discovery:
+        enabled: true
+        service-id: gugpay-config
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    publisher-returns: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+        concurrency: 1
+        max-concurrency: 1

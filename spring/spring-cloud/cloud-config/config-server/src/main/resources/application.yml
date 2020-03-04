@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native  # 除 默认 git方式外, 均要添加该配置 svn->subversion
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:///E:/Qwork/Git/learning/spring/spring-cloud/cloud-config/config-pro
+        git: # git方式下各参数必填
+          uri: file:///E:/Qwork/Git/learning/spring/spring-cloud/cloud-config/config-pro
+          search-paths:
+          username:
+          password:
+    bus:  # 开启bus跟踪
+      trace:
+        enabled: true
+  # bus 使用的mq
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+server:
+  port: 8001 # 8003
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /

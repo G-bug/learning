@@ -1,0 +1,81 @@
+spring:
+  profiles:
+    active: eureka
+  application:
+    name: gateway-consul
+  redis:            # 限流使用 redis rate
+    host: localhost
+    password: 12345
+    port: 6379
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+      ######################### 重试 (此处有问题,要请求方法返回status对应才会触发重试)
+      - id: retry_filter
+        uri: lb://consul-producer
+        predicates:
+        - Path=/retry
+        filters:
+        - name: Retry
+          args:
+            retries: 10               # 应尝试次数
+            statuses: GATEWAY_TIMEOUT # Http Status
+            series: CLIENT_ERROR
+      ########################## 熔断
+      - id: hystrix_filter
+        uri: lb://consul-producer
+        predicates:
+          - Path=/hystrix
+        filters:
+        - name: Hystrix
+          args:
+            name: costumername
+            fallbackUri: forward:/fallback
+      ######################### 限流
+      - id: request_ratelimiter_route
+        uri: lb://consul-producer
+        predicates:
+        - Path=/rate
+        filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 2  # token bucket 允许的填充速率 每秒请求数
+            redis-rate-limiter.burstCapacity: 3  # token bucket 的容量 一秒内最大请求数
+            key-resolver: "#{@ipKeyResolver}"    # SpEL 查找限流的定义Bean
+       ######################## 修改参数
+      - id: request_parameter_filter
+        # uri: http://localhost:8501
+        uri: lb://consul-producer       # lb 指使用全局过滤器LoadBalancerFilter解析service id
+        predicates:
+        - Path=/hello
+        filters:
+        - AddRequestParameter=foo, bar  # 转发并加入 foo=bar
+    consul:
+      host: localhost
+      port: 8500
+      discovery:        # 不需注册到consul
+        register: false
+
+server:
+  port: 8001
+
+logging:
+  level:
+    path: D://logs/
+
+########### predicates #########
+# - id: neo_route              # 自定义ID, 保持唯一
+#   predicates:                # 路由条件 多个组合使用
+#  - Path=/cloud-eureka       # 请求路径匹配
+# - After=2020-01-01T06:06:06+08:00[Asia/Shanghai]  # 在设置的时间之后(之前\之间)才转发到uri的地址
+# - Before=...
+# - Between=[时间],[时间]
+# - Cookie=...                  # 若请求有该cookie/header才转发
+# - Header=...
+# - Host=**.baidu.com           # 匹配Host(如下,www.baicu.com/tm.baidu.com都能正常转发)
+# - Method=GET
+# - Query=simple, hu.           # 请求参数 如 .../simple=hub 正确, ../simple=hxc 错误不转发
+# - RemoteAddr=192.168.1.1/10   # 发出请求的IP/子网掩码

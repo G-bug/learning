@@ -1,0 +1,24 @@
+spring:
+  cloud:
+    config:               # 配置中心
+      name: gugpay-service
+      profile: dev        # 读取的域
+      fail-fast: true
+      username: user
+      password: gugpay
+      discovery:
+        enabled: true
+        service-id: gugpay-config
+  rabbitmq:                 # bus 用于 filter refresh
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    publisher-returns: true  # 支持发布返回
+    listener:
+      simple:
+        acknowledge-mode: manual # 应答方式: 手动
+        concurrency: 1      # 最小消费者数量
+        max-concurrency: 1  # 最大消费者数量
+
+

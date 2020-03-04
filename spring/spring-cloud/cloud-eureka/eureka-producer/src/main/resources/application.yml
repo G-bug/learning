@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: eureka-producer
+  zipkin: # 跟踪
+    base-url: http://ZIPKIN-SERVER:9000
+  sleuth:
+    sampler:  # 采样
+      percentage: 1.0 # 百分比 default 是0.1 (10%)
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+---
+
+spring:
+  profiles: pro1
+
+server:
+  port: 9002
+
+--- # 模拟多服务提供者
+
+spring:
+  profiles: pro2
+
+server:
+  port: 9003

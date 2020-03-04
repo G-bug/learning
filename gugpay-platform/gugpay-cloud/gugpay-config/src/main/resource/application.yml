@@ -1,0 +1,35 @@
+server:
+  port: 8002
+
+spring:
+  application:
+    name: gugpay-config
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          # 临时使用
+          search-locations: file:///E:/Qwork/Git/learning/gugpay-platform/gugpay-cloud/gugpay-config/src/main/resource/shared
+    consul:           # 注册中心
+      host: localhost
+      port: 8500
+      discovery:
+        service-name: gugpay-config
+  rabbitmq:           # bus 用
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+management:             # 开启 /bus-refresh等
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /
+
+logging:
+  file:
+   path: ./log/gugpay-config.log

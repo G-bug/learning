@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+
+logging:
+  path: D:/logs/aop
+  level.root: INFO
+
+
+
+
+

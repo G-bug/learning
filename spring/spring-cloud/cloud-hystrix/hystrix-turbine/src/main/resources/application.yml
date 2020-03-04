@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: hystrix-turbine
+
+server:
+  port: 8001
+
+turbine:
+  app-config: hystrix-consumer-01,hystrix-consumer-02
+  aggregator:
+    cluster-config: default
+  cluster-name-expression: new String("default")
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+
+# 解决地址被拦截问题
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: hystrix.stream
+      base-path: /

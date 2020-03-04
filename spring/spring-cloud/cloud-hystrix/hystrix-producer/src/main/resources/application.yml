@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: hystrix-producer
+  profiles: pro1
+
+server:
+  port: 9001
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+
+--- # 模拟 同服务 多提供者的情况
+spring:
+  application:
+    name: hystrix-producer
+  profiles: pro2
+
+server:
+  port: 9002
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+
+logging:
+  level:
+    path: D://logs/

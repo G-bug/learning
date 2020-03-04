@@ -1,0 +1,45 @@
+server:
+  port: 8001
+
+spring:
+  application:
+    name: gugpay-service
+cloud:
+    consul:               # 注册中心
+      host: localhost
+      port: 8500
+      discovery:
+        service-name: gugpay-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,bus-refresh  # 开启config client: refresh对单个配置的更新, bus-refresh 对总线上的全部更新
+      base-path: /
+
+logging:
+  file:
+    path: ./log/gugpay-service.log
+
+############# 代码逻辑用配置 ############
+
+alipay:
+  # 文档地址
+  doc_url: https://docs.open.alipay.com/api_1/alipay.trade.create/
+  # 下单地址
+  request_url: https://openapi.alipay.com/gateway.do
+  # 异步通知地址 http/https
+  notify_url: http://localhost:15672
+  # 同步跳转地址
+  return_url: http://localhost:15672
+  # 加密
+  signtype: RSA2
+
+wxpay:
+  notify_url: http://localhost:15672
+  cert.root.path:
+
+cert:
+  root:
+    path:

@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: zipkin-server
+
+server:
+  port: 9000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+
+# actuator properties
+mangement:
+  endpoints:
+    web:
+      exposure: #暴露出去的接口
+        include:  zipkin
+      base-bath:  /
+  metrics:  # 指标 解决 ../zipkin地址进不去的问题
+    web:
+      server:
+        request:
+          autotime:
+            enabled: false

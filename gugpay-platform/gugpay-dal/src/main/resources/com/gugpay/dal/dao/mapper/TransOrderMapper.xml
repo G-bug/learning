@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gugpay.dal.dao.mapper.TransOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.gugpay.dal.dao.model.TransOrder" >
+    <id column="transOrderId" property="transOrderId" jdbcType="VARCHAR" />
+    <result column="mchId" property="mchId" jdbcType="VARCHAR" />
+    <result column="mchTransNo" property="mchTransNo" jdbcType="VARCHAR" />
+    <result column="channelId" property="channelId" jdbcType="VARCHAR" />
+    <result column="amount" property="amount" jdbcType="BIGINT" />
+    <result column="currency" property="currency" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="result" property="result" jdbcType="TINYINT" />
+    <result column="clientIp" property="clientIp" jdbcType="VARCHAR" />
+    <result column="device" property="device" jdbcType="VARCHAR" />
+    <result column="remarkInfo" property="remarkInfo" jdbcType="VARCHAR" />
+    <result column="channelUser" property="channelUser" jdbcType="VARCHAR" />
+    <result column="userName" property="userName" jdbcType="VARCHAR" />
+    <result column="channelMchId" property="channelMchId" jdbcType="VARCHAR" />
+    <result column="channelOrderNo" property="channelOrderNo" jdbcType="VARCHAR" />
+    <result column="channelErrCode" property="channelErrCode" jdbcType="VARCHAR" />
+    <result column="channelErrMsg" property="channelErrMsg" jdbcType="VARCHAR" />
+    <result column="extra" property="extra" jdbcType="VARCHAR" />
+    <result column="notifyUrl" property="notifyUrl" jdbcType="VARCHAR" />
+    <result column="param1" property="param1" jdbcType="VARCHAR" />
+    <result column="param2" property="param2" jdbcType="VARCHAR" />
+    <result column="expireTime" property="expireTime" jdbcType="TIMESTAMP" />
+    <result column="transSuccTime" property="transSuccTime" jdbcType="TIMESTAMP" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    transOrderId, mchId, mchTransNo, channelId, amount, currency, status, result, clientIp, 
+    device, remarkInfo, channelUser, userName, channelMchId, channelOrderNo, channelErrCode, 
+    channelErrMsg, extra, notifyUrl, param1, param2, expireTime, transSuccTime, createTime, 
+    updateTime
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.gugpay.dal.dao.model.TransOrderExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_trans_order
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset != null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_trans_order
+    where transOrderId = #{transOrderId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from t_trans_order
+    where transOrderId = #{transOrderId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.gugpay.dal.dao.model.TransOrderExample" >
+    delete from t_trans_order
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.gugpay.dal.dao.model.TransOrder" >
+    insert into t_trans_order (transOrderId, mchId, mchTransNo, 
+      channelId, amount, currency, 
+      status, result, clientIp, 
+      device, remarkInfo, channelUser, 
+      userName, channelMchId, channelOrderNo, 
+      channelErrCode, channelErrMsg, extra, 
+      notifyUrl, param1, param2, 
+      expireTime, transSuccTime, createTime, 
+      updateTime)
+    values (#{transOrderId,jdbcType=VARCHAR}, #{mchId,jdbcType=VARCHAR}, #{mchTransNo,jdbcType=VARCHAR}, 
+      #{channelId,jdbcType=VARCHAR}, #{amount,jdbcType=BIGINT}, #{currency,jdbcType=VARCHAR}, 
+      #{status,jdbcType=TINYINT}, #{result,jdbcType=TINYINT}, #{clientIp,jdbcType=VARCHAR}, 
+      #{device,jdbcType=VARCHAR}, #{remarkInfo,jdbcType=VARCHAR}, #{channelUser,jdbcType=VARCHAR}, 
+      #{userName,jdbcType=VARCHAR}, #{channelMchId,jdbcType=VARCHAR}, #{channelOrderNo,jdbcType=VARCHAR}, 
+      #{channelErrCode,jdbcType=VARCHAR}, #{channelErrMsg,jdbcType=VARCHAR}, #{extra,jdbcType=VARCHAR}, 
+      #{notifyUrl,jdbcType=VARCHAR}, #{param1,jdbcType=VARCHAR}, #{param2,jdbcType=VARCHAR}, 
+      #{expireTime,jdbcType=TIMESTAMP}, #{transSuccTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.gugpay.dal.dao.model.TransOrder" >
+    insert into t_trans_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="transOrderId != null" >
+        transOrderId,
+      </if>
+      <if test="mchId != null" >
+        mchId,
+      </if>
+      <if test="mchTransNo != null" >
+        mchTransNo,
+      </if>
+      <if test="channelId != null" >
+        channelId,
+      </if>
+      <if test="amount != null" >
+        amount,
+      </if>
+      <if test="currency != null" >
+        currency,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="result != null" >
+        result,
+      </if>
+      <if test="clientIp != null" >
+        clientIp,
+      </if>
+      <if test="device != null" >
+        device,
+      </if>
+      <if test="remarkInfo != null" >
+        remarkInfo,
+      </if>
+      <if test="channelUser != null" >
+        channelUser,
+      </if>
+      <if test="userName != null" >
+        userName,
+      </if>
+      <if test="channelMchId != null" >
+        channelMchId,
+      </if>
+      <if test="channelOrderNo != null" >
+        channelOrderNo,
+      </if>
+      <if test="channelErrCode != null" >
+        channelErrCode,
+      </if>
+      <if test="channelErrMsg != null" >
+        channelErrMsg,
+      </if>
+      <if test="extra != null" >
+        extra,
+      </if>
+      <if test="notifyUrl != null" >
+        notifyUrl,
+      </if>
+      <if test="param1 != null" >
+        param1,
+      </if>
+      <if test="param2 != null" >
+        param2,
+      </if>
+      <if test="expireTime != null" >
+        expireTime,
+      </if>
+      <if test="transSuccTime != null" >
+        transSuccTime,
+      </if>
+      <if test="createTime != null" >
+        createTime,
+      </if>
+      <if test="updateTime != null" >
+        updateTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="transOrderId != null" >
+        #{transOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="mchId != null" >
+        #{mchId,jdbcType=VARCHAR},
+      </if>
+      <if test="mchTransNo != null" >
+        #{mchTransNo,jdbcType=VARCHAR},
+      </if>
+      <if test="channelId != null" >
+        #{channelId,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null" >
+        #{amount,jdbcType=BIGINT},
+      </if>
+      <if test="currency != null" >
+        #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="result != null" >
+        #{result,jdbcType=TINYINT},
+      </if>
+      <if test="clientIp != null" >
+        #{clientIp,jdbcType=VARCHAR},
+      </if>
+      <if test="device != null" >
+        #{device,jdbcType=VARCHAR},
+      </if>
+      <if test="remarkInfo != null" >
+        #{remarkInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="channelUser != null" >
+        #{channelUser,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="channelMchId != null" >
+        #{channelMchId,jdbcType=VARCHAR},
+      </if>
+      <if test="channelOrderNo != null" >
+        #{channelOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="channelErrCode != null" >
+        #{channelErrCode,jdbcType=VARCHAR},
+      </if>
+      <if test="channelErrMsg != null" >
+        #{channelErrMsg,jdbcType=VARCHAR},
+      </if>
+      <if test="extra != null" >
+        #{extra,jdbcType=VARCHAR},
+      </if>
+      <if test="notifyUrl != null" >
+        #{notifyUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="param1 != null" >
+        #{param1,jdbcType=VARCHAR},
+      </if>
+      <if test="param2 != null" >
+        #{param2,jdbcType=VARCHAR},
+      </if>
+      <if test="expireTime != null" >
+        #{expireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="transSuccTime != null" >
+        #{transSuccTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.gugpay.dal.dao.model.TransOrderExample" resultType="java.lang.Integer" >
+    select count(*) from t_trans_order
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_trans_order
+    <set >
+      <if test="record.transOrderId != null" >
+        transOrderId = #{record.transOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mchId != null" >
+        mchId = #{record.mchId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mchTransNo != null" >
+        mchTransNo = #{record.mchTransNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.channelId != null" >
+        channelId = #{record.channelId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.amount != null" >
+        amount = #{record.amount,jdbcType=BIGINT},
+      </if>
+      <if test="record.currency != null" >
+        currency = #{record.currency,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null" >
+        status = #{record.status,jdbcType=TINYINT},
+      </if>
+      <if test="record.result != null" >
+        result = #{record.result,jdbcType=TINYINT},
+      </if>
+      <if test="record.clientIp != null" >
+        clientIp = #{record.clientIp,jdbcType=VARCHAR},
+      </if>
+      <if test="record.device != null" >
+        device = #{record.device,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remarkInfo != null" >
+        remarkInfo = #{record.remarkInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.channelUser != null" >
+        channelUser = #{record.channelUser,jdbcType=VARCHAR},
+      </if>
+      <if test="record.userName != null" >
+        userName = #{record.userName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.channelMchId != null" >
+        channelMchId = #{record.channelMchId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.channelOrderNo != null" >
+        channelOrderNo = #{record.channelOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.channelErrCode != null" >
+        channelErrCode = #{record.channelErrCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.channelErrMsg != null" >
+        channelErrMsg = #{record.channelErrMsg,jdbcType=VARCHAR},
+      </if>
+      <if test="record.extra != null" >
+        extra = #{record.extra,jdbcType=VARCHAR},
+      </if>
+      <if test="record.notifyUrl != null" >
+        notifyUrl = #{record.notifyUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.param1 != null" >
+        param1 = #{record.param1,jdbcType=VARCHAR},
+      </if>
+      <if test="record.param2 != null" >
+        param2 = #{record.param2,jdbcType=VARCHAR},
+      </if>
+      <if test="record.expireTime != null" >
+        expireTime = #{record.expireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.transSuccTime != null" >
+        transSuccTime = #{record.transSuccTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.createTime != null" >
+        createTime = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null" >
+        updateTime = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_trans_order
+    set transOrderId = #{record.transOrderId,jdbcType=VARCHAR},
+      mchId = #{record.mchId,jdbcType=VARCHAR},
+      mchTransNo = #{record.mchTransNo,jdbcType=VARCHAR},
+      channelId = #{record.channelId,jdbcType=VARCHAR},
+      amount = #{record.amount,jdbcType=BIGINT},
+      currency = #{record.currency,jdbcType=VARCHAR},
+      status = #{record.status,jdbcType=TINYINT},
+      result = #{record.result,jdbcType=TINYINT},
+      clientIp = #{record.clientIp,jdbcType=VARCHAR},
+      device = #{record.device,jdbcType=VARCHAR},
+      remarkInfo = #{record.remarkInfo,jdbcType=VARCHAR},
+      channelUser = #{record.channelUser,jdbcType=VARCHAR},
+      userName = #{record.userName,jdbcType=VARCHAR},
+      channelMchId = #{record.channelMchId,jdbcType=VARCHAR},
+      channelOrderNo = #{record.channelOrderNo,jdbcType=VARCHAR},
+      channelErrCode = #{record.channelErrCode,jdbcType=VARCHAR},
+      channelErrMsg = #{record.channelErrMsg,jdbcType=VARCHAR},
+      extra = #{record.extra,jdbcType=VARCHAR},
+      notifyUrl = #{record.notifyUrl,jdbcType=VARCHAR},
+      param1 = #{record.param1,jdbcType=VARCHAR},
+      param2 = #{record.param2,jdbcType=VARCHAR},
+      expireTime = #{record.expireTime,jdbcType=TIMESTAMP},
+      transSuccTime = #{record.transSuccTime,jdbcType=TIMESTAMP},
+      createTime = #{record.createTime,jdbcType=TIMESTAMP},
+      updateTime = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gugpay.dal.dao.model.TransOrder" >
+    update t_trans_order
+    <set >
+      <if test="mchId != null" >
+        mchId = #{mchId,jdbcType=VARCHAR},
+      </if>
+      <if test="mchTransNo != null" >
+        mchTransNo = #{mchTransNo,jdbcType=VARCHAR},
+      </if>
+      <if test="channelId != null" >
+        channelId = #{channelId,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null" >
+        amount = #{amount,jdbcType=BIGINT},
+      </if>
+      <if test="currency != null" >
+        currency = #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="result != null" >
+        result = #{result,jdbcType=TINYINT},
+      </if>
+      <if test="clientIp != null" >
+        clientIp = #{clientIp,jdbcType=VARCHAR},
+      </if>
+      <if test="device != null" >
+        device = #{device,jdbcType=VARCHAR},
+      </if>
+      <if test="remarkInfo != null" >
+        remarkInfo = #{remarkInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="channelUser != null" >
+        channelUser = #{channelUser,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        userName = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="channelMchId != null" >
+        channelMchId = #{channelMchId,jdbcType=VARCHAR},
+      </if>
+      <if test="channelOrderNo != null" >
+        channelOrderNo = #{channelOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="channelErrCode != null" >
+        channelErrCode = #{channelErrCode,jdbcType=VARCHAR},
+      </if>
+      <if test="channelErrMsg != null" >
+        channelErrMsg = #{channelErrMsg,jdbcType=VARCHAR},
+      </if>
+      <if test="extra != null" >
+        extra = #{extra,jdbcType=VARCHAR},
+      </if>
+      <if test="notifyUrl != null" >
+        notifyUrl = #{notifyUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="param1 != null" >
+        param1 = #{param1,jdbcType=VARCHAR},
+      </if>
+      <if test="param2 != null" >
+        param2 = #{param2,jdbcType=VARCHAR},
+      </if>
+      <if test="expireTime != null" >
+        expireTime = #{expireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="transSuccTime != null" >
+        transSuccTime = #{transSuccTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        createTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        updateTime = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where transOrderId = #{transOrderId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.gugpay.dal.dao.model.TransOrder" >
+    update t_trans_order
+    set mchId = #{mchId,jdbcType=VARCHAR},
+      mchTransNo = #{mchTransNo,jdbcType=VARCHAR},
+      channelId = #{channelId,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=BIGINT},
+      currency = #{currency,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      result = #{result,jdbcType=TINYINT},
+      clientIp = #{clientIp,jdbcType=VARCHAR},
+      device = #{device,jdbcType=VARCHAR},
+      remarkInfo = #{remarkInfo,jdbcType=VARCHAR},
+      channelUser = #{channelUser,jdbcType=VARCHAR},
+      userName = #{userName,jdbcType=VARCHAR},
+      channelMchId = #{channelMchId,jdbcType=VARCHAR},
+      channelOrderNo = #{channelOrderNo,jdbcType=VARCHAR},
+      channelErrCode = #{channelErrCode,jdbcType=VARCHAR},
+      channelErrMsg = #{channelErrMsg,jdbcType=VARCHAR},
+      extra = #{extra,jdbcType=VARCHAR},
+      notifyUrl = #{notifyUrl,jdbcType=VARCHAR},
+      param1 = #{param1,jdbcType=VARCHAR},
+      param2 = #{param2,jdbcType=VARCHAR},
+      expireTime = #{expireTime,jdbcType=TIMESTAMP},
+      transSuccTime = #{transSuccTime,jdbcType=TIMESTAMP},
+      createTime = #{createTime,jdbcType=TIMESTAMP},
+      updateTime = #{updateTime,jdbcType=TIMESTAMP}
+    where transOrderId = #{transOrderId,jdbcType=VARCHAR}
+  </update>
+</mapper>

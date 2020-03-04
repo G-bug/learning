@@ -1,0 +1,51 @@
+---
+spring:
+  application:
+    name: eureka-cluster    # 服务名称
+  profiles: peer1
+
+server:
+  port: 8001
+
+eureka:
+  instance:
+    hostname: peer1
+  client: # 客户端(可以是提供者也可以是消费者)
+    register-with-eureka: true  # 注册eureka(自己)到eureka server, 缺省true
+    fetch-registry: false    # 是否从eureka server发现\检索服务,缺省true
+    service-url:         # 与eureka server的交互地址, 查询服务和注册服务均依赖这个,多个","分隔
+      defaultZone: http://peer2:8002/eureka/,http://peer3:8003/eureka/
+---
+spring:
+  application:
+    name: eureka-cluster
+  profiles: peer2
+
+server:
+  port: 8002
+
+eureka:
+  instance:
+    hostname: peer2
+  client:
+    register-with-eureka: true
+    fetch-registry: false
+    service-url:
+      defaultZone: http://peer1:8001/eureka/,http://peer3:8003/eureka/
+---
+spring:
+  application:
+    name: eureka-cluster
+  profiles: peer3
+
+server:
+  port: 8003
+
+eureka:
+  instance:
+    hostname: peer3
+  client:
+    register-with-eureka: true
+    fetch-registry: false
+    service-url:
+      defaultZone: http://peer1:8001/eureka/,http://peer2:8002/eureka/

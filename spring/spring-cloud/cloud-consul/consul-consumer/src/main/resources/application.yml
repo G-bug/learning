@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: consul-consumer
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery: # 不需要注册到consul
+        register: false
+
+server:
+  port: 8504
