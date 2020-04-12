@@ -24,7 +24,7 @@ public class ServerSocketTest {
 
             // 写入器
             try (Scanner scanner = new Scanner(inputStream, "UTF-8")) {
-                // 扫描器
+                // 扫描器 (auto flush)
                 PrintWriter out = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true);
                 out.println("Enter BYE to exit");
 
