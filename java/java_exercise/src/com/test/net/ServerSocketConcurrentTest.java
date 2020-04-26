@@ -30,7 +30,7 @@ public class ServerSocketConcurrentTest {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }       
+        }
     }
 }
 
