@@ -22,12 +22,13 @@
     <field name="Id" class="java.lang.Integer">
         <fieldDescription><![CDATA[id]]></fieldDescription>
     </field>
-
-    <field name="Name" class="java.lang.String">
+    <field name="Name">
         <!-- 数据源映射 -->
         <fieldDescription><![CDATA[name]]></fieldDescription>
     </field>
-
+    <!---->
+    <sortField name="Id" order="Descending"/>
+    <sortField name="Name"/>
     <detail>
         <!-- 显示在报表中的数据 -->
         <band height="15">
