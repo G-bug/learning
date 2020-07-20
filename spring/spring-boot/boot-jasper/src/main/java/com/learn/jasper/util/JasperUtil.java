@@ -104,6 +104,7 @@ public class JasperUtil {
      */
     private static <T> String getPrintPath(List<T> dataSource, String jasperFilePath) throws JRException {
         JRBeanCollectionDataSource jrBeanCollectionDataSource = new JRBeanCollectionDataSource(dataSource);
+        // 全量填充
         return JasperFillManager.fillReportToFile(
                 jasperFilePath,
                 new HashMap<String, Object>() {{
@@ -113,5 +114,9 @@ public class JasperUtil {
                     */
                 }},
                 jrBeanCollectionDataSource);
+    }
+
+    public static void main(String[] args) throws JRException {
+        getJasperPath("report");
     }
 }
