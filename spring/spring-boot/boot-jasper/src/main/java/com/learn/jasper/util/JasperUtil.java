@@ -1,5 +1,6 @@
 package com.learn.jasper.util;
 
+import com.learn.jasper.entity.JasperModel;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
@@ -11,6 +12,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +37,22 @@ public class JasperUtil {
     private static final String EXPORT_PREFIX = "/home/g-bug/";
 
     /**
+     * 统一处理加工表内数据
+     *
+     * @param dataSource 源
+     * @param <T>        源
+     * @return model对象
+     */
+    private static <T> List<JasperModel> createDataSource(List<T> dataSource) {
+        return new ArrayList<JasperModel>() {{
+            add(new JasperModel() {{
+                setDate("");
+                setTable(new JRBeanCollectionDataSource(dataSource));
+            }});
+        }};
+    }
+
+    /**
      * 导出excel表格
      *
      * @param dataSource 数据源
@@ -45,12 +64,12 @@ public class JasperUtil {
     public static <T> String exportXls(List<T> dataSource, String fileName) throws JRException {
         String exportFilePath = EXPORT_PREFIX + fileName + XLS;
 
-        String printFilePath = getPrintPath(dataSource, fileName);
+        String printFilePath = getPrintPath(createDataSource(dataSource), fileName);
         if (printFilePath != null) {
             JRXlsExporter exporter = new JRXlsExporter();
             exporter.setExporterInput(new SimpleExporterInput(printFilePath));
             exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(exportFilePath));
-            exporter.setConfiguration(new SimpleXlsxReportConfiguration(){{
+            exporter.setConfiguration(new SimpleXlsxReportConfiguration() {{
                 setWhitePageBackground(false);
                 setDetectCellType(true);
             }});
@@ -71,7 +90,7 @@ public class JasperUtil {
     public static <T> String exportHtml(List<T> dataSource, String fileName) throws JRException {
         String exportFilePath = EXPORT_PREFIX + fileName + HTML;
 
-        String printFilePath = getPrintPath(dataSource, fileName);
+        String printFilePath = getPrintPath(createDataSource(dataSource), fileName);
         if (printFilePath != null) {
             JasperExportManager.exportReportToHtmlFile(printFilePath, exportFilePath);
         }
@@ -88,7 +107,7 @@ public class JasperUtil {
      * @throws JRException jasper异常
      */
     public static <T> void exportPdfStream(List<T> dataSource, String fileName, OutputStream outputStream) throws JRException {
-        JasperExportManager.exportReportToPdfStream(getPrint(dataSource, fileName), outputStream);
+        JasperExportManager.exportReportToPdfStream(getPrint(createDataSource(dataSource), fileName), outputStream);
     }
 
     /**
@@ -101,7 +120,7 @@ public class JasperUtil {
      * @throws JRException jasper异常
      */
     public static <T> void exportXlsStream(List<T> dataSource, String fileName, OutputStream outputStream) throws JRException {
-        String printFilePath = getPrintPath(dataSource, fileName);
+        String printFilePath = getPrintPath(createDataSource(dataSource), fileName);
         if (printFilePath != null) {
             JRXlsExporter exporter = new JRXlsExporter();
             exporter.setExporterInput(new SimpleExporterInput(printFilePath));
@@ -122,7 +141,7 @@ public class JasperUtil {
     public static <T> String exportPdf(List<T> dataSource, String fileName) throws JRException {
         String exportFilePath = EXPORT_PREFIX + fileName + PDF;
 
-        String printFilePath = getPrintPath(dataSource, fileName);
+        String printFilePath = getPrintPath(createDataSource(dataSource), fileName);
         if (printFilePath != null) {
             JasperExportManager.exportReportToPdfFile(printFilePath, exportFilePath);
         }
@@ -147,10 +166,8 @@ public class JasperUtil {
         return JasperFillManager.fillReportToFile(
                 jasperFilePath,
                 new HashMap<String, Object>() {{
-                    /*
-                    put("ReportTitle", "aaaa");
-                    put("Author", "bbbb");
-                    */
+                    // 供jrxml取出
+                    put("format", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
                 }},
                 jrBeanCollectionDataSource);
     }
