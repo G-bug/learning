@@ -1,22 +1,25 @@
 package com.learn.jasper.util;
 
 import com.learn.jasper.entity.JasperModel;
+import com.learn.jasper.entity.Point;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
+import org.apache.ibatis.scripting.xmltags.ExpressionEvaluator;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * jasper导出工具类
@@ -40,10 +43,9 @@ public class JasperUtil {
      * 统一处理加工表内数据
      *
      * @param dataSource 源
-     * @param <T>        源
      * @return model对象
      */
-    private static <T> List<JasperModel> createDataSource(List<T> dataSource) {
+    private static List<JasperModel> createDataSource(List<?> dataSource) {
         return new ArrayList<JasperModel>() {{
             add(new JasperModel() {{
                 setDate("");
@@ -57,11 +59,10 @@ public class JasperUtil {
      *
      * @param dataSource 数据源
      * @param fileName   文件名
-     * @param <T>        数据源
      * @return 文件地址
      * @throws JRException jasper异常
      */
-    public static <T> String exportXls(List<T> dataSource, String fileName) throws JRException {
+    public static String exportXls(List<?> dataSource, String fileName) throws JRException {
         String exportFilePath = EXPORT_PREFIX + fileName + XLS;
 
         String printFilePath = getPrintPath(createDataSource(dataSource), fileName);
@@ -83,11 +84,10 @@ public class JasperUtil {
      *
      * @param dataSource 数据源
      * @param fileName   文件路径
-     * @param <T>        源
      * @return 路径
      * @throws JRException jasper异常
      */
-    public static <T> String exportHtml(List<T> dataSource, String fileName) throws JRException {
+    public static String exportHtml(List<?> dataSource, String fileName) throws JRException {
         String exportFilePath = EXPORT_PREFIX + fileName + HTML;
 
         String printFilePath = getPrintPath(createDataSource(dataSource), fileName);
@@ -103,10 +103,9 @@ public class JasperUtil {
      * @param dataSource   数据源
      * @param fileName     文件路径
      * @param outputStream 目标流
-     * @param <T>          源
      * @throws JRException jasper异常
      */
-    public static <T> void exportPdfStream(List<T> dataSource, String fileName, OutputStream outputStream) throws JRException {
+    public static void exportPdfStream(List<?> dataSource, String fileName, OutputStream outputStream) throws JRException {
         JasperExportManager.exportReportToPdfStream(getPrint(createDataSource(dataSource), fileName), outputStream);
     }
 
@@ -116,10 +115,9 @@ public class JasperUtil {
      * @param dataSource   数据源
      * @param fileName     文件路径
      * @param outputStream 目标流
-     * @param <T>          源
      * @throws JRException jasper异常
      */
-    public static <T> void exportXlsStream(List<T> dataSource, String fileName, OutputStream outputStream) throws JRException {
+    public static void exportXlsStream(List<?> dataSource, String fileName, OutputStream outputStream) throws JRException {
         String printFilePath = getPrintPath(createDataSource(dataSource), fileName);
         if (printFilePath != null) {
             JRXlsExporter exporter = new JRXlsExporter();
@@ -134,11 +132,10 @@ public class JasperUtil {
      *
      * @param dataSource 数据源
      * @param fileName   文件名
-     * @param <T>        数据源
      * @return 文件地址
      * @throws JRException jasper异常
      */
-    public static <T> String exportPdf(List<T> dataSource, String fileName) throws JRException {
+    public static String exportPdf(List<?> dataSource, String fileName) throws JRException {
         String exportFilePath = EXPORT_PREFIX + fileName + PDF;
 
         String printFilePath = getPrintPath(createDataSource(dataSource), fileName);
@@ -153,11 +150,10 @@ public class JasperUtil {
      *
      * @param dataSource 数据源
      * @param fileName   文件名
-     * @param <T>        数据源
      * @return 文件地址
      * @throws JRException jasper异常
      */
-    private static <T> String getPrintPath(List<T> dataSource, String fileName) throws JRException {
+    private static String getPrintPath(List<?> dataSource, String fileName) throws JRException {
 
         String jasperFilePath = getJasperPath(fileName);
 
@@ -172,7 +168,15 @@ public class JasperUtil {
                 jrBeanCollectionDataSource);
     }
 
-    private static <T> JasperPrint getPrint(List<T> dataSource, String fileName) throws JRException {
+    /**
+     * 获取 print对象
+     *
+     * @param dataSource
+     * @param fileName
+     * @return
+     * @throws JRException
+     */
+    private static JasperPrint getPrint(List<?> dataSource, String fileName) throws JRException {
 
         String jasperFilePath = getJasperPath(fileName);
 
@@ -209,8 +213,144 @@ public class JasperUtil {
         return jasperFilePath;
     }
 
+    /**
+     * 动态输出
+     *
+     * @param dataSource
+     * @param fileName
+     * @return
+     * @throws JRException
+     */
+    public static String reportDesign(List<Point> dataSource, String fileName) throws JRException {
+
+        dataSource.forEach(o -> {
+            if ("4".equals(o.getType())) {
+                compiler(dataSource, o);
+            }
+        });
+
+        List<Point> list = toDesigns(dataSource);
+
+        JasperReport report = JasperDesignDemo.getJasperReport(
+                JASPER_PREFIX + fileName + XML, list);
+
+        // 一定要传  new JREmptyDataSource() 指定空数据源
+        JasperPrint jasperPrint = JasperFillManager.fillReport(report, new HashMap<>(), new JREmptyDataSource());
+
+        JasperExportManager.exportReportToHtmlFile(jasperPrint, EXPORT_PREFIX + fileName + HTML);
+
+        JRXlsExporter exporter = new JRXlsExporter();
+        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(EXPORT_PREFIX + fileName + XLS));
+        exporter.setConfiguration(new SimpleXlsxReportConfiguration() {{
+        }});
+
+        exporter.exportReport();
+
+        return "report1" + HTML;
+    }
+
+    /**
+     * 公式处理
+     *
+     * @param points
+     * @param point
+     * @return
+     */
+    public static Point compiler(List<Point> points, Point point) {
+        String[] childPointCode = point.getCont().split("\\+");
+        Integer[] sum = new Integer[childPointCode.length];
+        int i = 0;
+
+        for (String chile : childPointCode) {
+            Point dependPoint = points.stream().filter(o -> chile.equals(o.getCellCode())).findAny().orElse(null);
+            if ("4".equals(point.getType())) {
+                sum[i] = Integer.valueOf(compiler(points, dependPoint).getCont());
+                dependPoint.setType("1");
+                dependPoint.setCont(sum[i].toString());
+                i++;
+            } else {
+                sum[i++] = Integer.valueOf(point.getCont());
+            }
+        }
+
+        point.setCont((Arrays.stream(sum).mapToInt(o -> o).sum()) + "");
+        point.setType("5");
+        return point;
+    }
+
+    /**
+     * 转换为动态输出所需对象结构
+     *
+     * @param source
+     * @return
+     */
+    public static List<Point> toDesigns(List<Point> source) {
+        Map<Integer, List<Point>> rowMap = source.stream().collect(
+                Collectors.groupingBy(Point::getX, Collectors.toList())
+        );
+
+        List<Point> list = new ArrayList<>();
+        for (Map.Entry<Integer, List<Point>> entry : rowMap.entrySet()) {
+            list.add(new Point() {{
+                setX(entry.getKey());
+                setRow(entry.getValue());
+            }});
+        }
+        return list;
+    }
+
+    public static List<Point> poiCompiler(List<Point> source) {
+        source = Point.getTest();
+
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("G4B-1表内信用风险加权资产计算表(权重法）");
+
+        List<Point> rowPoint;
+        Point cellPoint;
+        for (int i = 0; i < source.size(); i++) {
+            Row row = sheet.createRow(i);
+            for (int j = 0; j < (rowPoint = source.get(i).getRow()).size(); j++) {
+                cellPoint = rowPoint.get(j);
+                Cell cell = row.createCell(j);
+                if (Objects.equals("4", cellPoint.getType())) {
+                    cell.setCellFormula(cellPoint.getCont());
+                } else {
+                    cell.setCellValue(cellPoint.getCont());
+                }
+            }
+        }
+        workbook.getCreationHelper().createFormulaEvaluator().evaluateAll();
+        return source;
+    }
+
     public static void main(String[] args) throws JRException {
-        //getJasperPath("report");
-        System.out.println(DateFormat.getDateInstance().format(new Date().getTime()));
+        JasperReport report = JasperDesignDemo.getJasperReport(JASPER_PREFIX + "report1" + XML,
+                Point.getTest());
+
+        // 一定要传  new JREmptyDataSource() 指定空数据源
+        JasperPrint jasperPrint = JasperFillManager.fillReport(report, new HashMap<>(), new JREmptyDataSource());
+
+        JasperExportManager.exportReportToHtmlFile(jasperPrint, EXPORT_PREFIX + "report1" + HTML);
+
+        JRXlsExporter exporter = new JRXlsExporter();
+        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(EXPORT_PREFIX + "report1" + XLS));
+        exporter.setConfiguration(new SimpleXlsxReportConfiguration() {{
+        }});
+        exporter.exportReport();
+
+        String[][] a = new String[][]{
+                {"1-1", "1-2"},
+                {"2-1", "2-2"}
+        };
+
+        /*
+        JasperDesign design = JRXmlLoader.load(JASPER_PREFIX + "report1" + XML);
+        JRDesignBand columnHeader = (JRDesignBand) design.getColumnHeader();
+        String key = ((JRElement)columnHeader.getChildren().get(0)).getKey();
+        JRDesignStaticText ccc = (JRDesignStaticText) columnHeader.getElementByKey("flag");
+        System.out.println(a.length);
+        */
     }
 }

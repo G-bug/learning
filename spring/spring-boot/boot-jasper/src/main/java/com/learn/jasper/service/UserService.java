@@ -5,7 +5,9 @@ package com.learn.jasper.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.learn.jasper.entity.Point;
 import com.learn.jasper.entity.User;
+import com.learn.jasper.mapper.PointMapper;
 import com.learn.jasper.mapper.UserMapper;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,17 @@ public class UserService {
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private PointMapper pointMapper;
+
+    public List<Point> getCells(){
+        return pointMapper.selectLineCell();
+    };
+
+    public List<Point> getMapCells(){
+        return pointMapper.selectMapCell();
+    };
 
     public User getById(int id) {
         return userMapper.selectById(id);
