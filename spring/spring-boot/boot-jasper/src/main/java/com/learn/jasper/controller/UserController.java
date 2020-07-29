@@ -4,11 +4,14 @@ import com.learn.jasper.service.UserService;
 import com.learn.jasper.util.JasperUtil;
 import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -23,10 +26,10 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("report_design_v1")
-    public String report6() {
+    public String report6(HttpServletRequest request, HttpServletResponse response) {
         try {
-            return JasperUtil.reportDesign(userService.getMapCells(), "report1");
-        } catch (JRException e) {
+            return JasperUtil.reportPoiDesign(userService.getMapCells(), ResourceUtils.getFile("classpath:") + "/report1");
+        } catch (JRException | FileNotFoundException e) {
             e.printStackTrace();
         }
         return "error";

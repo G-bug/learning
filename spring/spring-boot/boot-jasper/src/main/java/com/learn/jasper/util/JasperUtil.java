@@ -4,15 +4,17 @@ import com.learn.jasper.entity.JasperModel;
 import com.learn.jasper.entity.Point;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
 import org.apache.ibatis.scripting.xmltags.ExpressionEvaluator;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -36,8 +38,8 @@ public class JasperUtil {
     private static final String HTML = ".html";
     private static final String PDF = ".pdf";
 
-    private static final String JASPER_PREFIX = "/home/g-bug/workspace/git/learning/spring/spring-boot/boot-jasper/src/main/resources/";
-    private static final String EXPORT_PREFIX = "/home/g-bug/";
+    private static final String JASPER_PREFIX = "";
+    private static final String EXPORT_PREFIX = "";
 
     /**
      * 统一处理加工表内数据
@@ -186,7 +188,7 @@ public class JasperUtil {
         return JasperFillManager.fillReport(
                 jasperFilePath,
                 new HashMap<String, Object>() {{
-                    /*
+                    /* 传入jrxml param
                     put("ReportTitle", "aaaa");
                     put("Author", "bbbb");
                     */
@@ -300,11 +302,42 @@ public class JasperUtil {
         return list;
     }
 
-    public static List<Point> poiCompiler(List<Point> source) {
-        source = Point.getTest();
+    /**
+     * poi动态导出
+     *
+     * @param source   源
+     * @param fileName 文件
+     * @return
+     * @throws JRException
+     */
+    public static String reportPoiDesign(List<Point> source, String fileName) throws JRException {
+        JasperReport report = JasperDesignDemoPoi.getJasperReport(
+                JASPER_PREFIX + fileName + XML, poiCompiler(source));
 
+        // 一定要传  new JREmptyDataSource() 指定空数据源
+        JasperPrint jasperPrint = JasperFillManager.fillReport(report, new HashMap<>(), new JREmptyDataSource());
+
+        JasperExportManager.exportReportToHtmlFile(jasperPrint, EXPORT_PREFIX + fileName + HTML);
+
+        JRXlsExporter exporter = new JRXlsExporter();
+        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(EXPORT_PREFIX + fileName + XLS));
+        exporter.setConfiguration(new SimpleXlsxReportConfiguration() {{
+        }});
+
+        exporter.exportReport();
+        return "report1" + HTML;
+    }
+
+    /**
+     * 转换poi 以完成公式计算
+     *
+     * @param source 源
+     * @return
+     */
+    public static HSSFSheet poiCompiler(List<Point> source) {
         HSSFWorkbook workbook = new HSSFWorkbook();
-        HSSFSheet sheet = workbook.createSheet("G4B-1表内信用风险加权资产计算表(权重法）");
+        HSSFSheet sheet = workbook.createSheet("xx");
 
         List<Point> rowPoint;
         Point cellPoint;
@@ -314,43 +347,19 @@ public class JasperUtil {
                 cellPoint = rowPoint.get(j);
                 Cell cell = row.createCell(j);
                 if (Objects.equals("4", cellPoint.getType())) {
+                    cell.setCellType(CellType.FORMULA);
                     cell.setCellFormula(cellPoint.getCont());
                 } else {
-                    cell.setCellValue(cellPoint.getCont());
+                    if (Objects.equals("1", cellPoint.getType())) {
+                        cell.setCellValue(Double.parseDouble(cellPoint.getCont()));
+                    } else {
+                        cell.setCellValue(cellPoint.getCont());
+                    }
                 }
             }
         }
+
         workbook.getCreationHelper().createFormulaEvaluator().evaluateAll();
-        return source;
-    }
-
-    public static void main(String[] args) throws JRException {
-        JasperReport report = JasperDesignDemo.getJasperReport(JASPER_PREFIX + "report1" + XML,
-                Point.getTest());
-
-        // 一定要传  new JREmptyDataSource() 指定空数据源
-        JasperPrint jasperPrint = JasperFillManager.fillReport(report, new HashMap<>(), new JREmptyDataSource());
-
-        JasperExportManager.exportReportToHtmlFile(jasperPrint, EXPORT_PREFIX + "report1" + HTML);
-
-        JRXlsExporter exporter = new JRXlsExporter();
-        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(EXPORT_PREFIX + "report1" + XLS));
-        exporter.setConfiguration(new SimpleXlsxReportConfiguration() {{
-        }});
-        exporter.exportReport();
-
-        String[][] a = new String[][]{
-                {"1-1", "1-2"},
-                {"2-1", "2-2"}
-        };
-
-        /*
-        JasperDesign design = JRXmlLoader.load(JASPER_PREFIX + "report1" + XML);
-        JRDesignBand columnHeader = (JRDesignBand) design.getColumnHeader();
-        String key = ((JRElement)columnHeader.getChildren().get(0)).getKey();
-        JRDesignStaticText ccc = (JRDesignStaticText) columnHeader.getElementByKey("flag");
-        System.out.println(a.length);
-        */
+        return sheet;
     }
 }

@@ -56,7 +56,6 @@
             (SELECT x FROM t2 GROUP BY x) t
         LEFT JOIN
             t2 t1 ON t.x = t1.x
-        ORDER BY t1.x
+        ORDER BY t1.x,t1.y
     </select>
-
 </mapper>
