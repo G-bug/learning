@@ -4,16 +4,15 @@ import com.learn.jasper.service.UserService;
 import com.learn.jasper.util.JasperUtil;
 import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.file.Files;
 
 /**
  * @author g-bug
@@ -25,11 +24,18 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    /**
+     * poi 加入计算
+     * @param request
+     * @param response
+     * @return
+     */
     @GetMapping("report_design_v1")
     public String report6(HttpServletRequest request, HttpServletResponse response) {
         try {
-            return JasperUtil.reportPoiDesign(userService.getMapCells(), ResourceUtils.getFile("classpath:") + "/report1");
-        } catch (JRException | FileNotFoundException e) {
+            JasperUtil.reportPoiDesign(userService.getMapCells(), "report1");
+            return "success";
+        } catch (JRException | IOException e) {
             e.printStackTrace();
         }
         return "error";

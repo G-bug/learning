@@ -9,13 +9,15 @@ import net.sf.jasperreports.engine.design.JRDesignStaticText;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 
 import java.awt.*;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
+import java.util.concurrent.Executors;
 
 /**
  * @author g-bug
@@ -23,9 +25,9 @@ import java.util.Iterator;
  */
 public class JasperDesignDemoPoi {
 
-    public static JasperReport getJasperReport(String xmlFilePath,
-                                               HSSFSheet sheet) throws JRException {
-        JasperDesign design = getJasperDesign(xmlFilePath);
+    public static JasperReport getJasperReport(InputStream in,
+                                               Sheet sheet) throws JRException {
+        JasperDesign design = getJasperDesign(in);
 
         JRDesignBand columnHeader = (JRDesignBand) design.getColumnHeader();
         reSetColumnHeaderHeight(columnHeader, sheet);
@@ -34,13 +36,13 @@ public class JasperDesignDemoPoi {
         return JasperCompileManager.compileReport(design);
     }
 
-    private static JasperDesign getJasperDesign(String filePath)
+    private static JasperDesign getJasperDesign(InputStream in)
             throws JRException {
-        return JRXmlLoader.load(filePath);
+        return JRXmlLoader.load(in);
     }
 
     private static void reSetColumnHeaderHeight(JRDesignBand columnHeader,
-                                                HSSFSheet sheet) {
+                                                Sheet sheet) {
         columnHeader.setHeight(columnHeader.getHeight() * sheet.getLastRowNum() + 20);
     }
 
@@ -53,7 +55,7 @@ public class JasperDesignDemoPoi {
      * 处理 columnHeader中的内容
      */
     private static void reSetshapeAndPosition(JRDesignBand columnHeader,
-                                              HSSFSheet sheet) {
+                                              Sheet sheet) {
         // 获得 模板文本框
         JRDesignStaticText flagText = getFlagTextInDesign(columnHeader);
 
@@ -68,7 +70,7 @@ public class JasperDesignDemoPoi {
     }
 
     private static void addElementToColumnHeader(JRDesignBand columnHeader,
-                                                 HSSFSheet sheet) {
+                                                 Sheet sheet) {
         // 删除 模板 框
         JRDesignStaticText flagText = getFlagTextInDesign(columnHeader);
         columnHeader.removeElement(flagText);

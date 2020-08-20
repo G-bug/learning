@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.13.0.final using JasperReports Library version 6.13.0-46ada4d1be8f3c5985fd0b6146f3ed44caed6f05  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report" pageWidth="3990" pageHeight="5000" columnWidth="3990" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="78eb7681-9d97-4a66-81f1-b7b40651ea5f">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="report" pageWidth="3990" pageHeight="5000" columnWidth="3990" leftMargin="0" rightMargin="0"
+              topMargin="0" bottomMargin="0" uuid="78eb7681-9d97-4a66-81f1-b7b40651ea5f">
     <property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
     <property name="com.jaspersoft.studio.unit." value="pixel"/>
     <property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -73,7 +77,7 @@
                     <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
                 </box>
                 <textElement textAlignment="Center" verticalAlignment="Middle">
-                    <font fontName="华文宋体" size="13" isBold="true"/>
+                    <font fontName="SansSerif" size="13" isBold="true"/>
                 </textElement>
                 <text><![CDATA[G4B-1 表内信用风险加权资产计算表(权重法)]]></text>
             </staticText>
@@ -90,7 +94,7 @@
                     <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
                 </box>
                 <textElement textAlignment="Left" verticalAlignment="Bottom">
-                    <font size="8" isBold="true"/>
+                    <font fontName="SansSerif" size="8" isBold="true"/>
                 </textElement>
                 <text><![CDATA[货币单元: 万元]]></text>
             </staticText>
@@ -107,9 +111,10 @@
                     <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
                 </box>
                 <textElement textAlignment="Left" verticalAlignment="Bottom">
-                    <font fontName="华文宋体" size="8" isBold="true"/>
+                    <font fontName="Serif" size="8" isBold="true"/>
                 </textElement>
-                <textFieldExpression><![CDATA["日期:"+$P{format}.format(java.util.Calendar.getInstance().getTime())]]></textFieldExpression>
+                <textFieldExpression>
+                    <![CDATA["日期:"+$P{format}.format(java.util.Calendar.getInstance().getTime())]]></textFieldExpression>
             </textField>
             <staticText>
                 <reportElement key="" x="0" y="30" width="210" height="30" uuid="a7042ba7-5cf1-40e1-a802-93fc9786f846">
@@ -125,7 +130,7 @@
                     <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
                 </box>
                 <textElement textAlignment="Left" verticalAlignment="Bottom">
-                    <font size="8" isBold="true"/>
+                    <font fontName="SansSerif" size="8" isBold="true"/>
                 </textElement>
                 <text><![CDATA[ 填报机构:]]></text>
             </staticText>
@@ -604,7 +609,8 @@
         <band height="20">
             <property name="com.jaspersoft.studio.unit.height" value="px"/>
             <staticText>
-                <reportElement key="flag" style="Table_CH" x="0" y="0" width="210" height="20" backcolor="#FFFFFF" uuid="a992add0-625a-463a-ae1b-4109d2b4943a">
+                <reportElement key="flag" style="Table_CH" x="0" y="0" width="210" height="20" backcolor="#FFFFFF"
+                               uuid="a992add0-625a-463a-ae1b-4109d2b4943a">
                     <property name="com.jaspersoft.studio.unit.x" value="px"/>
                     <property name="com.jaspersoft.studio.unit.height" value="px"/>
                     <property name="com.jaspersoft.studio.unit.width" value="px"/>

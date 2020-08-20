@@ -4,18 +4,18 @@ import com.learn.jasper.entity.JasperModel;
 import com.learn.jasper.entity.Point;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
-import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
-import org.apache.ibatis.scripting.xmltags.ExpressionEvaluator;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -39,7 +39,8 @@ public class JasperUtil {
     private static final String PDF = ".pdf";
 
     private static final String JASPER_PREFIX = "";
-    private static final String EXPORT_PREFIX = "";
+    // jar包运行则 jar包所在路径, idea运行则为当前根路径
+    private static final String EXPORT_PREFIX = "/app/rep/";
 
     /**
      * 统一处理加工表内数据
@@ -173,10 +174,10 @@ public class JasperUtil {
     /**
      * 获取 print对象
      *
-     * @param dataSource
-     * @param fileName
-     * @return
-     * @throws JRException
+     * @param dataSource 数据源
+     * @param fileName 文件名
+     * @return 文件地址
+     * @throws JRException jasper异常
      */
     private static JasperPrint getPrint(List<?> dataSource, String fileName) throws JRException {
 
@@ -218,10 +219,10 @@ public class JasperUtil {
     /**
      * 动态输出
      *
-     * @param dataSource
-     * @param fileName
-     * @return
-     * @throws JRException
+     * @param dataSource 源
+     * @param fileName 文件名
+     * @return 地址
+     * @throws JRException 异常
      */
     public static String reportDesign(List<Point> dataSource, String fileName) throws JRException {
 
@@ -255,9 +256,9 @@ public class JasperUtil {
     /**
      * 公式处理
      *
-     * @param points
-     * @param point
-     * @return
+     * @param points 实体列表
+     * @param point 对象
+     * @return 实体
      */
     public static Point compiler(List<Point> points, Point point) {
         String[] childPointCode = point.getCont().split("\\+");
@@ -302,17 +303,22 @@ public class JasperUtil {
         return list;
     }
 
+    private static InputStream getJrxml(String fileName) throws IOException {
+        ClassPathResource cpr = new ClassPathResource("static/report1.jrxml");
+        InputStream in = cpr.getInputStream();
+        return in;
+    }
+
     /**
      * poi动态导出
      *
      * @param source   源
      * @param fileName 文件
-     * @return
-     * @throws JRException
+     * @return 路径
+     * @throws JRException 异常
      */
-    public static String reportPoiDesign(List<Point> source, String fileName) throws JRException {
-        JasperReport report = JasperDesignDemoPoi.getJasperReport(
-                JASPER_PREFIX + fileName + XML, poiCompiler(source));
+    public static String reportPoiDesign(List<Point> source, String fileName) throws JRException, IOException {
+        JasperReport report = JasperDesignDemoPoi.getJasperReport(getJrxml(fileName), poiCompiler(source));
 
         // 一定要传  new JREmptyDataSource() 指定空数据源
         JasperPrint jasperPrint = JasperFillManager.fillReport(report, new HashMap<>(), new JREmptyDataSource());
@@ -323,6 +329,8 @@ public class JasperUtil {
         exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
         exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(EXPORT_PREFIX + fileName + XLS));
         exporter.setConfiguration(new SimpleXlsxReportConfiguration() {{
+            // 设置sheet页
+            // setSheetNames();
         }});
 
         exporter.exportReport();
@@ -335,9 +343,9 @@ public class JasperUtil {
      * @param source 源
      * @return
      */
-    public static HSSFSheet poiCompiler(List<Point> source) {
+    public static Sheet poiCompiler(List<Point> source) {
         HSSFWorkbook workbook = new HSSFWorkbook();
-        HSSFSheet sheet = workbook.createSheet("xx");
+        Sheet sheet = workbook.createSheet("xx");
 
         List<Point> rowPoint;
         Point cellPoint;
@@ -347,7 +355,7 @@ public class JasperUtil {
                 cellPoint = rowPoint.get(j);
                 Cell cell = row.createCell(j);
                 if (Objects.equals("4", cellPoint.getType())) {
-                    cell.setCellType(CellType.FORMULA);
+                    cell.setCellType(Cell.CELL_TYPE_FORMULA);
                     cell.setCellFormula(cellPoint.getCont());
                 } else {
                     if (Objects.equals("1", cellPoint.getType())) {
