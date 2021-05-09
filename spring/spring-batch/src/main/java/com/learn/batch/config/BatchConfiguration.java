@@ -6,7 +6,7 @@ import com.learn.batch.lisenter.AnnotationStepListener;
 import com.learn.batch.lisenter.JobListener;
 import com.learn.batch.lisenter.StepSkipListener;
 import com.learn.batch.processor.CustomProcessor;
-import io.micrometer.core.instrument.binder.db.PostgreSQLDatabaseMetrics;
+import com.learn.batch.repeat.CustomerRepeat;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.Step;
@@ -61,6 +61,9 @@ public class BatchConfiguration {
 
     @Autowired
     public StepSkipListener stepSkipListener;
+
+    @Autowired
+    public CustomerRepeat customerRepeat;
 
     @Bean
     public Job personJob(JobListener listener, Step step1) {
@@ -219,10 +222,11 @@ public class BatchConfiguration {
                 .writer(writer)
 
                 // 增加事务支持
-                .transactionAttribute(attribute)
+                //.transactionAttribute(attribute)
 
                 // 默认 step completed则不会再执行, 该方法解除限制, 每次重启都会再次执行
                 .allowStartIfComplete(true)
+                //.stepOperations(customerRepeat)
                 .build();
     }
 
@@ -249,7 +253,7 @@ public class BatchConfiguration {
                     }
                 })
                 // 处理先决任务, 执行x次之后再次重启job执行此处则抛出StartLimitExceededException
-                .startLimit(2)
+                //.startLimit(2)
                 .build();
     }
 

@@ -33,7 +33,7 @@ public class Receiver {
 
     @RabbitListener(queues = {"FANOUT_QUEUE_B"})
     public void on1(Message message, Channel channel) throws IOException {
-        channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
+        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         log.debug("FANOUT_QUEUE_B" + new String(message.getBody()));
     }
 
