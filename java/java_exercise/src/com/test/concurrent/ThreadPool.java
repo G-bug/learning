@@ -96,5 +96,11 @@ class MatchCounter implements Callable<Integer> {
         }
     }
 
+    final private boolean xx() {
+        return false;
+    }
 
+    private boolean xx(int x){
+        return true;
+    }
 }

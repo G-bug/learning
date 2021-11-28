@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.concurrent.ThreadPoolExecutor;
+
 /**
  * @auth Administrator
  */
@@ -35,6 +38,19 @@ public class ServiceController {
 
     @RequestMapping("/hello")
     public String callHello() {
+
+        String.class.getMethods();
+
+
+        ArrayList<String> cc = new ArrayList<String>();
+
+
+
+        Thread a = new Thread(() -> {
+
+        });
+        a.start();
+
         ServiceInstance serviceInstance = loadBalancer.choose("service-producer");
         System.out.println("服务地址:" + serviceInstance.getUri());
         return new RestTemplate().getForObject(serviceInstance.getUri().toString() + "/hello", String.class);

@@ -6,6 +6,9 @@ server:
   port: 8000
 
 eureka:
+  server:
+    # 自我保护机制开启, 15min中 >15% 损失 则不再剔除服务
+    enable-self-preservation: false
   client:
     register-with-eureka: true
     fetch-registry: false
