@@ -1,7 +1,6 @@
 package com.test.date;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -16,9 +15,15 @@ public class DateProcess {
 
     public static void main(String[] args) {
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        LocalDate localDate = LocalDate.parse("2021-12-26", dateTimeFormatter);
+        LocalDate localDate = LocalDate.parse("2021-12-26 00:24:24", dateTimeFormatter);
+
+        System.out.println(dateTimeFormatter.format(
+                LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(System.currentTimeMillis()),
+                        ZoneId.systemDefault()))
+        );
 
         System.out.println(LocalDate.now().compareTo(localDate));
 
