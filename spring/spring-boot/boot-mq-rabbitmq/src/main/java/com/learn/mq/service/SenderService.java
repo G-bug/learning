@@ -3,6 +3,7 @@
  */
 package com.learn.mq.service;
 
+import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.support.CorrelationData;
 import org.springframework.stereotype.Service;
@@ -30,5 +31,13 @@ public class SenderService {
     public void direct(String p) {
         CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
         rabbitTemplate.convertAndSend("DIRECT_EXCHANGE", "DIRECT_ROUTING_KEY", p, correlationData);
+    }
+
+    public void broadcastAndPersistent(String p) {
+        rabbitTemplate.convertAndSend("FANOUT_EXCHANGE", "", p, mes -> {
+            // 消息持久化 设置
+            mes.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+            return mes;
+        });
     }
 }

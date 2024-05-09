@@ -6,11 +6,18 @@ package com.learn.mq.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.retry.MessageRecoverer;
+import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 
 import javax.annotation.Resource;
 
@@ -56,6 +63,29 @@ public class RabbitConfig {
         return rabbitTemplate;
     }
 
+    // SimpleRabbitListenerContainerFactory RabbitMQ 监听器容器工厂
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+
+        // 设置重试模板
+        RetryTemplate retryTemplate = new RetryTemplate();
+        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
+        backOffPolicy.setBackOffPeriod(5000); // 设置重试间隔时间为5秒
+        retryTemplate.setBackOffPolicy(backOffPolicy);
+
+        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
+        retryPolicy.setMaxAttempts(3); // 设置最大重试次数为3次
+        retryTemplate.setRetryPolicy(retryPolicy);
+        factory.setRetryTemplate(retryTemplate);
+
+        // 设置消息恢复器
+        MessageRecoverer messageRecoverer = new RepublishMessageRecoverer(amqpTemplate());
+        // 使用 RepublishMessageRecoverer 将消息重新发布到原始队列
+        return factory;
+    }
+
     //-------------- Direct exchange
 
     // 持久化, 为保证RabbitMQ重启消息也不丢失
@@ -69,7 +99,11 @@ public class RabbitConfig {
     // 声明 支持持久化的队列
     @Bean("directQueue")
     public Queue directQueue() {
-        return QueueBuilder.durable("DIRECT_QUEUE").build();
+        return QueueBuilder.durable("DIRECT_QUEUE")
+                .withArgument("x-message-ttl", 60000) // 设置消息过期时间为60秒
+                .withArgument("x-dead-letter-exchange", "dlxExchange") // 绑定dlx交换机
+                .withArgument("x-dead-letter-routing-key", "directQueue-dlx")
+                .build();
     }
 
     // 通过绑定键 将 指定队列 绑定到 指定 交换机
@@ -89,7 +123,11 @@ public class RabbitConfig {
     // 声明 可持久的fanout队列
     @Bean("fanoutQueueA")
     public Queue fanoutQueueA() {
-        return QueueBuilder.durable("FANOUT_QUEUE_A").build();
+        return QueueBuilder.durable("FANOUT_QUEUE_A")
+                .withArgument("x-message-ttl", 500)
+                .withArgument("x-dead-letter-exchange", "dlxExchange") // 绑定dlx交换机
+                .withArgument("x-dead-letter-routing-key", "directQueueFanout-dlx") // 对应dlx的key
+                .build();
     }
 
     @Bean("fanoutQueueB")
@@ -108,4 +146,31 @@ public class RabbitConfig {
         return BindingBuilder.bind(queue).to(fanoutExchange);
     }
 
+    // ------------- dlx
+    // 死信队列 用来和其他队列绑定 做为dlx的消息接收者
+    @Bean
+    public Queue deadLetterAQueue() {
+        return new Queue("deadLetterAQueue");
+    }
+    public Queue deadLetterBQueue() {
+        return new Queue("deadLetterBQueue");
+    }
+
+    // 死信交换机 用来转发死信消息到死信队列 可以为 direct fanout topic 任意
+    @Bean
+    public DirectExchange dlxExchange() {
+        return new DirectExchange("dlxExchange");
+    }
+
+    // A业务的dlx队列
+    @Bean
+    public Binding dlxBindDirectKey() {
+        return BindingBuilder.bind(deadLetterAQueue()).to(dlxExchange()).with("directQueue-dlx");
+    }
+
+    // B业务的 dlx队列
+    @Bean
+    public Binding dlxBindFanoutKey() {
+        return BindingBuilder.bind(deadLetterBQueue()).to(dlxExchange()).with("directQueueFanout-dlx");
+    }
 }
